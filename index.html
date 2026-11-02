@@ -11,37 +11,37 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#16171a;--sf:#212226;--tx:#ececf0;--mu:#9ca3af;--bd:#3a3c44;--pr:#d6639a;--rd:#7f1d1d;--rt:#fecaca;--gn:#14391f;--gt:#86efac;--ch:#2b2d33;--th:#33353c;--hd:#5b2024;--ht:#fecaca;--bn:#4a2a10;--bt:#fdba74}}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#16171a;--sf:#212226;--tx:#ececf0;--mu:#9ca3af;--bd:#3a3c44;--pr:#d6639a;--rd:#7f1d1d;--rt:#fecaca;--gn:#14391f;--gt:#86efac;--ch:#2b2d33;--th:#33353c;--hd:#5b2024;--ht:#fecaca;--bn:#4a2a10;--bt:#fdba74}
 *{box-sizing:border-box}html,body{height:auto}
-body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 "Sarabun","Noto Sans Thai",system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 "Sarabun","Noto Sans Thai",system-ui,sans-serif}
 #nav{display:flex;gap:6px;align-items:center;overflow-x:auto;background:var(--pr);padding:10px 12px;position:sticky;top:0;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 #nav .br{color:#fff;margin-right:8px;white-space:nowrap;font-size:16px}
-#nav button{border:0;background:rgba(255,255,255,.18);color:#fff;padding:7px 14px;border-radius:999px;font:inherit;white-space:nowrap;cursor:pointer}
+#nav button{border:0;background:rgba(255,255,255,.18);color:#fff;padding:7px 14px;border-radius:999px;font:inherit;font-size:15px;white-space:nowrap;cursor:pointer}
 #nav button.on{background:#fff;color:var(--pr);font-weight:600}
 main{padding:16px 20px;width:100%;max-width:none}
-h2{margin:4px 0 12px;font-size:21px;color:var(--tx)}
+h2{margin:4px 0 12px;font-size:25px;color:var(--tx)}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:12px}
-.bar label{display:flex;flex-direction:column;font-size:12px;color:var(--mu)}
+.bar label{display:flex;flex-direction:column;font-size:13px;color:var(--mu)}
 input,select,button.b{font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:6px 9px}
 button.b{cursor:pointer}button.p{background:var(--pr);color:#fff;border-color:transparent}button.x{color:var(--rt)}
 .w{overflow:auto;max-height:calc(100vh - 200px);min-height:260px;border:1px solid var(--bd);border-radius:10px;background:var(--sf);box-shadow:0 1px 3px rgba(0,0,0,.06)}
 table{border-collapse:collapse;width:100%;min-width:640px}
 th,td{border:1px solid var(--bd);padding:6px 8px;vertical-align:top;text-align:left}
-th{background:var(--th);color:var(--tx);position:sticky;top:0;z-index:3;height:34px;box-shadow:inset 0 -1px var(--bd)}th.h2{top:34px;z-index:2}
+th{background:var(--th);color:var(--tx);position:sticky;top:0;z-index:3;height:40px;box-shadow:inset 0 -1px var(--bd)}th.h2{top:40px;z-index:2}
 td.d{background:var(--ch);white-space:nowrap;font-weight:600;min-width:104px}td.d small{display:block;color:var(--mu);font-weight:400}
 td.td{box-shadow:inset 4px 0 var(--pr)}
 tr.hd td{background:var(--hd);color:var(--ht)}tr.hd td.d{font-weight:700}tr.hd small{color:var(--ht)}tr.hd .chip{background:var(--sf);color:var(--tx)}tr.hd .chip.red{background:var(--rd);color:var(--rt)}
-.chip{display:inline-flex;gap:4px;align-items:center;background:var(--ch);border-radius:999px;padding:2px 9px;margin:0 4px 4px 0;font-size:13px}
+.chip{display:inline-flex;gap:4px;align-items:center;background:var(--ch);border-radius:999px;padding:3px 11px;margin:0 4px 4px 0;font-size:15px}
 .chip.red,.red{background:var(--rd);color:var(--rt)}.chip.grn,.grn{background:var(--gn);color:var(--gt)}
 .chip b{cursor:pointer;color:var(--mu)}.hdz{display:block;color:var(--mu);font-size:11px;margin-bottom:3px}
-td select.hs,.hbox{border:2px solid var(--pr);background:var(--sf);color:var(--pr);font-weight:700;font-size:14px;margin-bottom:6px}.hbox{border-radius:8px;padding:5px 8px}td select{width:100%;border-style:dashed;color:var(--mu);font-size:13px;padding:4px}
+td select.hs,.hbox{border:2px solid var(--pr);background:var(--sf);color:var(--pr);font-weight:700;font-size:16px;margin-bottom:6px}.hbox{border-radius:8px;padding:5px 8px}td select{width:100%;border-style:dashed;color:var(--mu);font-size:15px;padding:5px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.card .n{font-size:28px;font-weight:700;color:var(--pr)}.card small{color:var(--mu);display:block}
+.card .n{font-size:32px;font-weight:700;color:var(--pr)}.card small{color:var(--mu);display:block}
 .card.red small,.card.grn small{color:inherit}
-.tag{padding:1px 10px;border-radius:999px;font-size:12px;background:var(--ch)}.tag.red,.card.red{background:var(--rd);color:var(--rt)}.tag.grn,.card.grn{background:var(--gn);color:var(--gt)}
+.tag{padding:1px 10px;border-radius:999px;font-size:13px;background:var(--ch)}.tag.red,.card.red{background:var(--rd);color:var(--rt)}.tag.grn,.card.grn{background:var(--gn);color:var(--gt)}
 #toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#222;color:#fff;padding:8px 16px;border-radius:999px;display:none;z-index:9}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .chip.ban,.tag.ban,.card.ban,tr.ban td,tr.hd .chip.ban{background:var(--bn);color:var(--bt)}
-#svb{display:flex;gap:6px;align-items:center;white-space:nowrap;margin:0 8px}#nav button.sv1{background:#fde047;color:#422006;font-weight:700}.svt{color:#fff;font-size:12px}
+#svb{display:flex;gap:6px;align-items:center;white-space:nowrap;margin:0 8px}#nav button.sv1{background:#fde047;color:#422006;font-weight:700}.svt{color:#fff;font-size:13px}
 @media print{#nav,.bar,td select,.chip b,.np{display:none!important}body{background:#fff}.w{overflow:visible;max-height:none;box-shadow:none}th{position:static}}
 </style>
 </head>
@@ -163,18 +163,24 @@ function hol(d){const i=st.holidays.indexOf(d);if(i<0)st.holidays.push(d);else{s
 function addHol(){const d=$('#h_d').value;if(!d)return toast('เลือกวันที่ก่อน');if(!st.holidays.includes(d))st.holidays.push(d);st.hnames[d]=$('#h_n').value.trim();save();render();toast('เพิ่มวันหยุดแล้ว')}
 function holTab(){const ls=[...st.holidays].sort();return`<h2>วันหยุดบริษัท</h2><div class="bar np"><label>วันที่<input type="date" id="h_d" value="${today}"></label><label>ชื่อวันหยุด<input id="h_n" placeholder="เช่น วันปีใหม่" style="min-width:200px"></label><button class="b p" onclick="addHol()">เพิ่มวันหยุด</button></div><div class="w"><table><tr><th>วันที่</th><th>ชื่อวันหยุด</th><th class="np"></th></tr>${ls.map(d=>`<tr class="hd"><td class="d">${fmt(d)}<small>${TH[dow(d)]}</small></td><td>${esc(st.hnames[d]||'-')}</td><td class="np"><button class="b x" onclick="cf('h${d}',()=>hol('${d}'))">ลบ</button></td></tr>`).join('')||'<tr><td colspan="3">ยังไม่มีวันหยุดบริษัท</td></tr>'}</table></div><p class="np" style="color:var(--mu)">วันอาทิตย์และวันหยุดบริษัทแสดงเป็นสีแดง · วันหยุดบริษัทจะไม่จัดล้างตลาดและรับแลกขยะ</p>`}
 function grid(title,ks,note,hdr){const sk=!!S[ks[0]].days,days=daysOf(month).filter(d=>!sk||S[ks[0]].days.includes(dow(d)));
-return`<h2>${title}</h2>${bar()}<div class="w"><table${ks.length>3?' style="min-width:1250px"':''}>${hdr||`<tr><th>วันที่</th>${ks.map(k=>`<th>${S[k].n}</th>`).join('')}</tr>`}${days.map(d=>{const w=dow(d),h=st.holidays.includes(d);return`<tr class="${w==0||h?'hd':''}"><td class="d ${d==today?'td':''}">${fmt(d)}<small>${TH[w]}${ks[0]=='wash'?(w==2||w==6?' · ริมโขง':' · ตลาด'):''}${h?' · '+esc(st.hnames[d]||'วันหยุด'):''} <a class="np" style="cursor:pointer;text-decoration:underline" onclick="hol('${d}')">${h?'ยกเลิกหยุด':'ตั้งวันหยุด'}</a></small></td>${h&&sk?`<td colspan="${ks.length}">หยุด</td>`:ks.map(k=>cell(d,k)).join('')}</tr>`}).join('')}</table></div><p class="np" style="color:var(--mu)">${note}</p>`}
+return`<h2>${title}</h2>${bar()}<div class="w"><table${ks.length>3?' style="min-width:1500px"':''}>${hdr||`<tr><th>วันที่</th>${ks.map(k=>`<th>${S[k].n}</th>`).join('')}</tr>`}${days.map(d=>{const w=dow(d),h=st.holidays.includes(d);return`<tr class="${w==0||h?'hd':''}"><td class="d ${d==today?'td':''}">${fmt(d)}<small>${TH[w]}${ks[0]=='wash'?(w==2||w==6?' · ริมโขง':' · ตลาด'):''}${h?' · '+esc(st.hnames[d]||'วันหยุด'):''} <a class="np" style="cursor:pointer;text-decoration:underline" onclick="hol('${d}')">${h?'ยกเลิกหยุด':'ตั้งวันหยุด'}</a></small></td>${h&&sk?`<td colspan="${ks.length}">หยุด</td>`:ks.map(k=>cell(d,k)).join('')}</tr>`}).join('')}</table></div><p class="np" style="color:var(--mu)">${note}</p>`}
 const male=e=>e.name.startsWith('ท้าว');
-const DIV=4,REST=1.5,HIST=90,CAP=12; // DIV/CAP=ถ่วงให้หมุนหน้าที่ที่ยังไม่ได้ทำ (ชม.เทียบเท่า) REST=เลี่ยงทำติดกันสองวัน HIST=นับย้อนหลังกี่วัน
-function auto(){const days=daysOf(month),hrs={},cnt={},last={};
-const f0=new Date(days[0]+'T00:00');for(const d in st.sched){const dd=(f0-new Date(d+'T00:00'))/864e5;if(dd>0&&dd<=HIST)for(const k in st.sched[d])if(S[k])st.sched[d][k].forEach(id=>{hrs[id]=(hrs[id]||0)+S[k].h;cnt[id+k]=(cnt[id+k]||0)+1})}
+const DIV=4,REST=4,HIST=90,CAP=12,STREAK2=20,DAYS=4,WDAY=6,SAME=6;
+const PW={duty:.35,gym:.08,kid:.08,wash:.1,rec:.05},fac=e=>Math.max(.4,1-(e.no||[]).reduce((a,x)=>a+(PW[x]||.05),0)); // คนที่มีข้อยกเว้นเวร (สิทธิพิเศษ) จะได้โอทีน้อยกว่าเพื่อนตามสัดส่วน ไม่ถูกดึงมาจัดทุกวัน
+// ค่าถ่วงน้ำหนัก (หน่วย=ชั่วโมงเทียบเท่า): DIV/CAP หมุนหน้าที่ที่ยังไม่ได้ทำ · REST ทำติดกัน 2 วัน · STREAK2 ติดกัน 3 วัน · DAYS/WDAY ทำเกิน 4 วันในรอบ 7 วัน · SAME หน้าที่เดิมซ้ำในสัปดาห์ 
+const dayN=d=>Math.round(new Date(d+'T00:00')/864e5);
+function auto(){const days=daysOf(month),hrs={},cnt={},rec={};const addRec=(id,n,g)=>(rec[id]=rec[id]||[]).push({n,g});
+const f0=new Date(days[0]+'T00:00');for(const d in st.sched){const dd=(f0-new Date(d+'T00:00'))/864e5;if(dd>0&&dd<=HIST)for(const k in st.sched[d])if(S[k])st.sched[d][k].forEach(id=>{hrs[id]=(hrs[id]||0)+S[k].h;cnt[id+k]=(cnt[id+k]||0)+1;if(dd<=7)addRec(id,dayN(d),sgrp(k))})}
 days.forEach(d=>{delete st.sched[d];delete st.hd[d]});
-for(const d of days){const w=dow(d),used=new Set();st.sched[d]={};st.hd[d]={};const di=days.indexOf(d);['m','a','e'].forEach((sh,si)=>['T','N','H'].forEach(po=>{const L=st.hl[po]||[];if(L.length)st.hd[d][sh+po]=L[(di+si)%L.length]}));const LW=st.hl.W||[];if(LW.length&&S.wash.days.includes(w)&&!st.holidays.includes(d))st.hd[d].wash=LW[di%LW.length];
+for(const d of days){const w=dow(d),used=new Set();st.sched[d]={};st.hd[d]={};const di=days.indexOf(d),dn=dayN(d);['m','a','e'].forEach((sh,si)=>['T','N','H'].forEach(po=>{const L=st.hl[po]||[];if(L.length)st.hd[d][sh+po]=L[(di+si)%L.length]}));const LW=st.hl.W||[];if(LW.length&&S.wash.days.includes(w)&&!st.holidays.includes(d))st.hd[d].wash=LW[di%LW.length];
 for(const k of['gym','kid','eT','eN','eH','mN','mH','mT','aT','aN','aH','wash','rec']){const s=S[k];if(s.days&&(!s.days.includes(w)||st.holidays.includes(d)))continue;const q=s.q(w);
 const pick=(n,f,grp)=>{const pool=st.emps.filter(e=>active(e,d)&&!off(e.id,d)&&can(e,k)&&!used.has(e.id)&&(grp?inGl(e,grp):inG(e,k))&&(!f||f(e)));
-const mc=pool.length?Math.min(...pool.map(e=>cnt[e.id+k]||0)):0;const sc=e=>(hrs[e.id]||0)+Math.min(CAP,DIV*((cnt[e.id+k]||0)-mc))+(last[e.id]===di-1?REST:0);
-pool.sort((x,y)=>(sc(x)-sc(y))||Math.random()-.5);
-return pool.slice(0,n).map(e=>{used.add(e.id);hrs[e.id]=(hrs[e.id]||0)+s.h;cnt[e.id+k]=(cnt[e.id+k]||0)+1;last[e.id]=di;return e.id})};
+const mc=pool.length?Math.min(...pool.map(e=>cnt[e.id+k]||0)):0,gk=sgrp(k);
+const sc=e=>{const r=rec[e.id]||[];let stk=0;while(r.some(y=>y.n===dn-1-stk))stk++;const wk=r.filter(y=>y.n>=dn-6);const dys=new Set(wk.map(y=>y.n)).size;const same=wk.filter(y=>y.g===gk).length;
+return(hrs[e.id]||0)/fac(e)+Math.min(CAP,DIV*((cnt[e.id+k]||0)-mc))+(stk>=1?REST:0)+(stk>=2?STREAK2:0)+Math.max(0,dys-DAYS)*WDAY+same*SAME};
+const sm=new Map(pool.map(e=>[e.id,sc(e)]));
+pool.sort((x,y)=>(sm.get(x.id)-sm.get(y.id))||Math.random()-.5);
+return pool.slice(0,n).map(e=>{used.add(e.id);hrs[e.id]=(hrs[e.id]||0)+s.h;cnt[e.id+k]=(cnt[e.id+k]||0)+1;addRec(e.id,dn,gk);return e.id})};
 const need=s.qg?s.qg().reduce((a,x)=>a+x[1],0):q.length==1?q[0]:q[0]+q[1];
 let ids=s.qg?s.qg().flatMap(([g,n])=>pick(n,e=>e.dept.split('/').includes(g))):q.length==1?pick(q[0]):[...pick(q[0],e=>!male(e)),...pick(q[1],male)];
 if(ids.length<need&&s.fb)ids=[...ids,...pick(need-ids.length,null,s.fb)];
@@ -219,7 +225,10 @@ function addBan(){const emp=$('#b_e').value,from=$('#b_f').value,k=$('#b_k').val
 function delBan(id){st.bans=st.bans.filter(b=>b.id!==id);save();render()}
 function banTab(){const opts=st.emps.filter(e=>e.status!=='off').map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');const ls=[...st.bans].sort((a,b)=>b.from.localeCompare(a.from));const KN={d:'1 วัน',w:'1 อาทิตย์',m:'1 เดือน'};
 return`<h2>งดเวร (ทำผิดระเบียบ)</h2><div class="bar np"><label>ชื่อพนักงาน<select id="b_e">${opts}</select></label><label>เริ่มงดวันที่<input type="date" id="b_f" value="${today}"></label><label>ระยะเวลา<select id="b_k"><option value="d">1 วัน</option><option value="w">1 อาทิตย์</option><option value="m">1 เดือน</option></select></label><label>เหตุผล<input id="b_w" placeholder="ทำผิดระเบียบเรื่อง..." style="min-width:220px"></label><button class="b p" onclick="addBan()">บันทึกการงดเวร</button></div><div class="w"><table><tr><th>ชื่อ</th><th>เริ่มงด</th><th>สิ้นสุด</th><th>ระยะเวลา</th><th>เหตุผล</th><th class="np"></th></tr>${ls.map(b=>{const e=byId(b.emp)||{name:'(ลบแล้ว)'};const now=b.from<=today&&today<=b.to;return`<tr class="${now?'ban':''}"><td>${esc(e.name)}</td><td>${fmt(b.from)}</td><td>${fmt(b.to)}</td><td>${KN[b.k]||''}</td><td>${esc(b.why)}</td><td class="np"><button class="b x" onclick="cf('b${b.id}',()=>delBan('${b.id}'))">ลบ</button></td></tr>`}).join('')||'<tr><td colspan="6">ยังไม่มีข้อมูลการงดเวร</td></tr>'}</table></div><p class="np" style="color:var(--mu)">คนที่ถูกงดเวรจะไม่ถูกจัดเวรอัตโนมัติและไม่อยู่ในรายการเลือกชื่อ ในตารางที่จัดไว้แล้วจะแสดงสีส้ม (งด)</p>`}
-function render(){$('#nav').innerHTML='<b class="br">🌸 ตารางเวร</b>'+'<span style="font-size:12px;color:#fff;white-space:nowrap;margin-right:8px">'+(SB?(conn?'🟢 ออนไลน์':'🟡 กำลังเชื่อมต่อ...'):'🔴 ยังไม่ได้ตั้งค่า config.js')+'</span>'+'<span id="svb"></span>'+TABS.map(([k,n])=>`<button class="${k==tab?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
+const TC={ov:'#c0407a',duty:'#2f6fd6',gym:'#7c4dbd',kid:'#0f8b8d',wash:'#0e7fb8',rec:'#4d8a2b',emp:'#475569',lv:'#4f46e5',ban:'#b45309',hol:'#be185d',hist:'#0f766e'};
+function mixHex(h,t,a){const p=x=>parseInt(x,16),c=[1,3,5].map(i=>p(h.slice(i,i+2))),d=[1,3,5].map(i=>p(t.slice(i,i+2)));return'#'+c.map((v,i)=>Math.round(v*a+d[i]*(1-a)).toString(16).padStart(2,'0')).join('')}
+function paintTheme(){if(!document.documentElement)return;const c=TC[tab]||'#c0407a',dark=!!(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches),r=document.documentElement.style;r.setProperty('--pr',dark?mixHex(c,'#ffffff',.82):c);r.setProperty('--th',dark?mixHex(c,'#212226',.3):mixHex(c,'#ffffff',.16))}
+function render(){paintTheme();$('#nav').innerHTML='<b class="br">🌸 ตารางเวร</b>'+'<span style="font-size:12px;color:#fff;white-space:nowrap;margin-right:8px">'+(SB?(conn?'🟢 ออนไลน์':'🟡 กำลังเชื่อมต่อ...'):'🔴 ยังไม่ได้ตั้งค่า config.js')+'</span>'+'<span id="svb"></span>'+TABS.map(([k,n])=>`<button class="${k==tab?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
 paintSave();$('#main').innerHTML=tab=='ov'?ov():tab=='duty'?grid('ตารางเวรด่าน',KS9,'เช้า: ตลาด=แคมป์1 (ขาดคนเสริมแคมป์2) นาสั้ง/ห้วยย้อ=แคมป์2 · บ่าย: ตลาด=โอนเนอร์ 1 + แคมป์1 1 นาสั้ง/ห้วยย้อ=โอนเนอร์+แคมป์2 · เย็น: ตลาด=DC GB · จำนวนตลาด 2 นาสั้ง 2 ห้วยย้อ 1 คน/กะ (หัวหน้าด่านเลือกในช่องบนสุดของแต่ละช่อง ไม่นับโอที)',HDR):tab=='gym'?grid('ตารางยามโรงยิม',['gym'],'วันละ 1 คน ทุกวัน'):tab=='kid'?grid('ตารางยามเด็กตลาด',['kid'],'แม่บ้านแคมป์2 วันละ 3 คน + DC Camp วันละ 2 คน (ปรับจำนวนได้ในช่องด้านบน)'):tab=='wash'?grid('ตารางล้างตลาด (จ. อ. พ. ศ. ส.)',['wash'],'วันละ 13 คน (หญิง 9 + ชาย 4) หัวหน้าหมุนเวียนทุกคนยกเว้นสมสัก ไม่มี พฤหัส/อาทิตย์/วันหยุด'):tab=='rec'?grid('ตารางรับแลกขยะ (จ.-ศ.)',['rec'],'จันทร์ 15 · อังคาร 11 · พุธ 15 · พฤหัส 15 · ศุกร์ 7 คน (ไม่รวมหัวหน้า) ไม่มีวันหยุด'):tab=='emp'?emp():tab=='hol'?holTab():tab=='hist'?histTab():tab=='ban'?banTab():lv()}
 render();
 </script>
