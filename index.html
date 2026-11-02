@@ -41,6 +41,7 @@ td select.hs,.hbox{border:2px solid var(--pr);background:var(--sf);color:var(--p
 #toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#222;color:#fff;padding:8px 16px;border-radius:999px;display:none;z-index:9}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .chip.ban,.tag.ban,.card.ban,tr.ban td,tr.hd .chip.ban{background:var(--bn);color:var(--bt)}
+#svb{display:flex;gap:6px;align-items:center;white-space:nowrap;margin:0 8px}#nav button.sv1{background:#fde047;color:#422006;font-weight:700}.svt{color:#fff;font-size:12px}
 @media print{#nav,.bar,td select,.chip b,.np{display:none!important}body{background:#fff}.w{overflow:visible;max-height:none;box-shadow:none}th{position:static}}
 </style>
 </head>
@@ -64,7 +65,7 @@ const KS9=[];for(const sh in SH)for(const p in PO){S[sh+p]={n:PO[p][0],g:GR[sh+p
 S.mT.fb=['แคมป์2'];S.aT.qg=()=>[['โอนเนอร์',1],['แคมป์1',1]];
 const HDR='<tr><th rowspan="2">วันที่</th>'+Object.values(SH).map(x=>'<th colspan="3">'+x.n+'</th>').join('')+'</tr><tr>'+Object.values(PO).map(x=>'<th class="h2">'+x[0]+'</th>').join('').repeat(3)+'</tr>';
 const TH=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
-const TABS=[['ov','ภาพรวม'],['duty','เวรด่าน'],['gym','ยามโรงยิม'],['kid','ยามเด็กตลาด'],['wash','ล้างตลาด'],['rec','รับแลกขยะ'],['emp','พนักงาน'],['lv','วันลาพัก'],['ban','งดเวร'],['hol','วันหยุดบริษัท']];
+const TABS=[['ov','ภาพรวม'],['duty','เวรด่าน'],['gym','ยามโรงยิม'],['kid','ยามเด็กตลาด'],['wash','ล้างตลาด'],['rec','รับแลกขยะ'],['emp','พนักงาน'],['lv','วันลาพัก'],['ban','งดเวร'],['hol','วันหยุดบริษัท'],['hist','สถิติย้อนหลัง']];
 const $=s=>document.querySelector(s);
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -75,16 +76,67 @@ let tab='ov',month=today.slice(0,7),perSlot=3,fd=today,ef=null,armed={},DB=null,
 function def(){const m=new Map();R.forEach(([g,s])=>s.split(',').forEach(x=>{const[n,note,end,off]=x.split('#');let e=m.get(n);if(!e){e={id:'e'+(m.size+1),code:'E'+String(m.size+1).padStart(3,'0'),name:n,dept:g,phone:'',status:off?'off':'on',note:note||'',end:end||''};m.set(n,e)}else e.dept+='/'+g}));return{emps:[...m.values()],leaves:[],sched:{}}}
 function load(){try{const j=localStorage.getItem('rota');if(j)return JSON.parse(j)}catch(e){}return def()}
 const DEFHL={T:['พอนทิบ','คำวิไล','ทิดาพอน'],N:['เสาแก้ว'],H:['สมสัก'],W:['พอนทิบ','คำวิไล','ทิดาพอน','เสาแก้ว'],R:{1:['สมยอด','น้อยนิ','เวียงสะหวัน','แก้วมะนี'],2:['สมยอด','น้อยนิ','บุนมี'],3:['สมยอด','น้อยนิ','เวียงสะหวัน','บุนมี'],4:['สมยอด','น้อยนิ','เวียงสะหวัน','บุนมี'],5:['แก้วมะนี']}};
-function fixHl(){if(!st.hl||Array.isArray(st.hl))st.hl=JSON.parse(JSON.stringify(DEFHL));if(!st.hl.W)st.hl.W=[...DEFHL.W];if(!st.hl.R)st.hl.R=JSON.parse(JSON.stringify(DEFHL.R));st.bans=st.bans||[];st.kidA=st.kidA||3;st.kidB=st.kidB||2}
+function fixHl(){if(!st.hl||Array.isArray(st.hl))st.hl=JSON.parse(JSON.stringify(DEFHL));if(!st.hl.W)st.hl.W=[...DEFHL.W];if(!st.hl.R)st.hl.R=JSON.parse(JSON.stringify(DEFHL.R));st.bans=st.bans||[];st.kidA=st.kidA||3;st.kidB=st.kidB||2;st.stats=st.stats||{}}
 let st=load();st.holidays=st.holidays||[];st.hnames=st.hnames||{};st.hd=st.hd||{};fixHl();
 const SB_URL=((window.CONFIG||{}).URL||'').trim(),SB_KEY=((window.CONFIG||{}).KEY||'').trim();
 const SB=SB_URL.startsWith('https://')&&SB_KEY.length>40;
 const SBH={apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'};
-const fix=()=>{st.holidays=st.holidays||[];st.hnames=st.hnames||{};st.hd=st.hd||{};fixHl()};
-let pending=false,conn=false;
-function save(){st._v=Date.now();try{localStorage.setItem('rota',JSON.stringify(st))}catch(e){}if(!SB)return;pending=true;clearTimeout(tm);tm=setTimeout(push,700)}
-async function push(){try{const r=await fetch(SB_URL+'/rest/v1/app_state',{method:'POST',headers:{...SBH,Prefer:'resolution=merge-duplicates'},body:JSON.stringify([{id:'main',data:st},{id:'bk-'+today,data:st}])});if(!r.ok)throw 0;pending=false}catch(e){toast('บันทึกขึ้นเซิร์ฟเวอร์ไม่สำเร็จ ตรวจอินเทอร์เน็ตหรือไฟล์ config.js')}}
-async function pull(first){if(!SB||pending)return;const busy=/INPUT|SELECT|TEXTAREA/.test((document.activeElement||{}).tagName||'');try{const r=await fetch(SB_URL+'/rest/v1/app_state?id=eq.main&select=data',{headers:SBH});if(!r.ok)throw 0;const j=await r.json();const was=conn;conn=true;if(j[0]){const d=j[0].data;if(first||((d._v||0)>(st._v||0)&&!busy)){st=d;fix();render()}else if(!was)render()}else if(first){push();render()}}catch(e){if(conn){conn=false;render()}}}
+async function remoteGet(){const r=await fetch(SB_URL+'/rest/v1/app_state?id=eq.main&select=data',{headers:SBH});if(!r.ok)throw 0;const j=await r.json();return j[0]?j[0].data:null}
+async function remoteSet(o){const r=await fetch(SB_URL+'/rest/v1/app_state',{method:'POST',headers:{...SBH,Prefer:'resolution=merge-duplicates'},body:JSON.stringify([{id:'main',data:o},{id:'bk-'+today,data:o}])});if(!r.ok)throw 0}
+const canRemote=()=>SB;
+
+// ===== ระบบบันทึก: การแก้ไขเป็น "ร่าง" ในเครื่องนี้ จนกว่าจะกด 💾 บันทึก =====
+let dirty=false,baseStr='',baseV=0,remoteNewer=false,lastSaved='',histM='',conn=false;
+const PINREQ=((window.CONFIG||{}).PIN||'').trim();
+const norm=()=>{st.holidays=st.holidays||[];st.hnames=st.hnames||{};st.hd=st.hd||{};fixHl()};
+baseStr=JSON.stringify(st);baseV=st._v||0;
+if(window.addEventListener)window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+function readDraft(){try{const d=JSON.parse(localStorage.getItem('rota_draft')||'null');return d&&d.st?d:null}catch(e){return null}}
+function save(){dirty=true;try{localStorage.setItem('rota_draft',JSON.stringify({baseV,st}))}catch(e){}paintSave()}
+function paintSave(){const e=$('#svb');if(!e)return;
+e.innerHTML=dirty?`${PINREQ?'<input id="pin" type="password" placeholder="รหัสบันทึก" style="width:96px;padding:4px 8px;border-radius:8px;border:0">':''}<button class="sv1" onclick="commit()">💾 บันทึก</button><button onclick="cf('rv',revert)">↩ ยกเลิกการแก้ไข</button><span class="svt">● ยังไม่ได้บันทึก${remoteNewer?' · มีคนบันทึกใหม่กว่า':''}</span>`:`<span class="svt">✓ บันทึกแล้ว${lastSaved?' '+lastSaved:''}</span>`}
+function adopt(o,keepDraft){st=o;norm();baseStr=JSON.stringify(st);baseV=st._v||0;dirty=false;remoteNewer=false;if(!keepDraft){try{localStorage.removeItem('rota_draft')}catch(e){}}render()}
+async function pull(first){if(!canRemote())return;
+try{const o=await remoteGet();conn=true;
+if(!o){if(first)await commit(true);return}
+const rv=o._v||0;
+if(first){const d=readDraft();adopt(o,true);if(d&&d.baseV===rv){st=d.st;norm();dirty=true;render();toast('กู้คืนร่างที่ยังไม่ได้บันทึกแล้ว')}else{try{localStorage.removeItem('rota_draft')}catch(e){}}return}
+if(!dirty){if(rv>baseV&&!/INPUT|SELECT|TEXTAREA/.test((document.activeElement||{}).tagName||''))adopt(o)}
+else{const nv=rv>baseV;if(nv!==remoteNewer){remoteNewer=nv;paintSave()}}
+}catch(e){if(conn){conn=false;render()}}}
+async function commit(first){
+if(PINREQ&&!first){const v=($('#pin')||{}).value||'';if(v!==PINREQ)return toast('รหัสบันทึกไม่ถูกต้อง')}
+try{
+if(canRemote()&&!first){const o=await remoteGet();if(o&&(o._v||0)>baseV&&!armed.ov){armed={ov:1};setTimeout(()=>armed={},6000);return toast('มีคนบันทึกใหม่กว่า กดบันทึกอีกครั้งเพื่อบันทึกทับ หรือกดยกเลิกการแก้ไขเพื่อดูของใหม่')}}
+[...new Set(Object.keys(st.sched).map(d=>d.slice(0,7)))].forEach(m=>{st.stats[m]=computeStats(m)});
+st._v=Date.now();
+if(canRemote())await remoteSet(st);
+try{localStorage.setItem('rota',JSON.stringify(st));localStorage.removeItem('rota_draft')}catch(e){}
+baseStr=JSON.stringify(st);baseV=st._v;dirty=false;remoteNewer=false;armed={};
+lastSaved=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});paintSave();if(!first)toast('บันทึกเรียบร้อย')
+}catch(e){toast('บันทึกไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วลองใหม่')}}
+function revert(){try{st=JSON.parse(baseStr)}catch(e){return}try{localStorage.removeItem('rota_draft')}catch(e){}dirty=false;remoteNewer=false;render();toast('ยกเลิกการแก้ไขแล้ว');pull(false)}
+if(!window.claude&&!(typeof SB!=='undefined'&&SB)){const d=readDraft();if(d&&d.baseV===baseV){st=d.st;norm();dirty=true}}
+
+// ===== สถิติรายเดือน (เก็บตอนกดบันทึก ดูย้อนหลังได้) =====
+const GT=[['dutyT','ด่านตลาด'],['dutyN','ด่านนาสั้ง'],['dutyH','ด่านห้วยย้อ'],['gym','ยามโรงยิม'],['kid','ยามเด็กตลาด'],['wash','ล้างตลาด'],['rec','รับแลกขยะ']];
+const sgrp=k=>S[k].post?'duty'+k[1]:k;
+function computeStats(m){const rows=[],days=daysOf(m);
+for(const e of st.emps){const t={};let n=0,h=0,hd=0,lv=0,bn=0;
+for(const d of days){const du=duties(e.id,d);n+=du.length;du.forEach(k=>{h+=S[k].h;const g=sgrp(k);t[g]=(t[g]||0)+1});if(du.length&&(dow(d)==0||st.holidays.includes(d)))hd+=du.length;if(onLeave(e.id,d))lv++;if(onBan(e.id,d))bn++}
+if(n||lv||bn)rows.push({id:e.id,name:e.name,dept:e.dept,n,h,hd,lv,bn,t})}
+return{at:new Date().toISOString(),rows}}
+function histRows(){const ms=Object.keys(st.stats).sort();
+if(histM=='all'){const acc={};ms.forEach(m=>st.stats[m].rows.forEach(r=>{const a=acc[r.id]=acc[r.id]||{id:r.id,name:r.name,dept:r.dept,n:0,h:0,hd:0,lv:0,bn:0,t:{}};a.n+=r.n;a.h+=r.h;a.hd+=r.hd;a.lv+=r.lv;a.bn+=r.bn;for(const g in r.t)a.t[g]=(a.t[g]||0)+r.t[g]}));return Object.values(acc)}
+return(st.stats[histM]||{rows:[]}).rows}
+function histTab(){const ms=Object.keys(st.stats).sort().reverse();
+if(!ms.length)return`<h2>สถิติย้อนหลัง</h2><div class="card">ยังไม่มีสถิติ — จัดเวรแล้วกด 💾 บันทึก ระบบจะเก็บสถิติรายเดือนให้อัตโนมัติ</div>`;
+if(histM!='all'&&!ms.includes(histM))histM=ms[0];
+const rows=[...histRows()].sort((a,b)=>b.h-a.h),avg=rows.reduce((a,x)=>a+x.h,0)/(rows.length||1);
+const mx=rows.length?Math.max(...rows.map(x=>x.h)):0,mn=rows.length?Math.min(...rows.map(x=>x.h)):0;
+const grp=D.map(g=>{const r=rows.filter(x=>x.dept.split('/').includes(g));return g+' เฉลี่ย '+(r.reduce((a,x)=>a+x.h,0)/(r.length||1)).toFixed(1)+' ชม. ('+r.length+' คน)'});
+const at=histM=='all'?'':' · บันทึกเมื่อ '+new Date(st.stats[histM].at).toLocaleString('th-TH');
+return`<h2>สถิติย้อนหลัง</h2><div class="bar"><label>เดือน<select onchange="histM=this.value;render()"><option value="all" ${histM=='all'?'selected':''}>รวมทุกเดือน (สะสม)</option>${ms.map(m=>`<option value="${m}" ${m==histM?'selected':''}>${m}</option>`).join('')}</select></label></div><p style="color:var(--mu)">เฉลี่ย ${avg.toFixed(1)} ชม./คน · สูงสุด ${mx} · ต่ำสุด ${mn}${at}</p><p style="color:var(--mu)">${grp.join(' · ')}</p><div class="w"><table style="min-width:900px"><tr><th>ชื่อ</th><th>กลุ่ม</th><th>รอบโอที</th><th>ชั่วโมง</th><th>เทียบเฉลี่ย</th>${GT.map(g=>`<th>${g[1]}</th>`).join('')}<th>เวรวันหยุด</th><th>ลา (วัน)</th><th>งดเวร (วัน)</th></tr>${rows.map(x=>{const d=x.h-avg,c=d>avg*.15?'red':d<-avg*.15?'grn':'';return`<tr><td>${esc(x.name)}</td><td>${esc(x.dept.split('/').join(', '))}</td><td>${x.n}</td><td>${x.h}</td><td><span class="tag ${c}">${d>0?'+':''}${d.toFixed(1)}</span></td>${GT.map(g=>`<td>${x.t[g[0]]||'-'}</td>`).join('')}<td>${x.hd||'-'}</td><td>${x.lv||'-'}</td><td>${x.bn||'-'}</td></tr>`}).join('')}</table></div>`}
 pull(true);setInterval(()=>pull(false),10000);
 
 const byId=id=>st.emps.find(e=>e.id===id);
@@ -113,14 +165,14 @@ function holTab(){const ls=[...st.holidays].sort();return`<h2>วันหยุ
 function grid(title,ks,note,hdr){const sk=!!S[ks[0]].days,days=daysOf(month).filter(d=>!sk||S[ks[0]].days.includes(dow(d)));
 return`<h2>${title}</h2>${bar()}<div class="w"><table${ks.length>3?' style="min-width:1250px"':''}>${hdr||`<tr><th>วันที่</th>${ks.map(k=>`<th>${S[k].n}</th>`).join('')}</tr>`}${days.map(d=>{const w=dow(d),h=st.holidays.includes(d);return`<tr class="${w==0||h?'hd':''}"><td class="d ${d==today?'td':''}">${fmt(d)}<small>${TH[w]}${ks[0]=='wash'?(w==2||w==6?' · ริมโขง':' · ตลาด'):''}${h?' · '+esc(st.hnames[d]||'วันหยุด'):''} <a class="np" style="cursor:pointer;text-decoration:underline" onclick="hol('${d}')">${h?'ยกเลิกหยุด':'ตั้งวันหยุด'}</a></small></td>${h&&sk?`<td colspan="${ks.length}">หยุด</td>`:ks.map(k=>cell(d,k)).join('')}</tr>`}).join('')}</table></div><p class="np" style="color:var(--mu)">${note}</p>`}
 const male=e=>e.name.startsWith('ท้าว');
-const DIV=4,REST=1.5,HIST=90; // DIV=บทลงโทษเมื่อทำหน้าที่เดิมซ้ำ(ชม.) REST=บทลงโทษถ้าทำงานติดกันสองวัน HIST=นับโอทีย้อนหลังกี่วัน
+const DIV=4,REST=1.5,HIST=90,CAP=12; // DIV/CAP=ถ่วงให้หมุนหน้าที่ที่ยังไม่ได้ทำ (ชม.เทียบเท่า) REST=เลี่ยงทำติดกันสองวัน HIST=นับย้อนหลังกี่วัน
 function auto(){const days=daysOf(month),hrs={},cnt={},last={};
-const f0=new Date(days[0]+'T00:00');for(const d in st.sched){const dd=(f0-new Date(d+'T00:00'))/864e5;if(dd>0&&dd<=HIST)for(const k in st.sched[d])if(S[k])st.sched[d][k].forEach(id=>{hrs[id]=(hrs[id]||0)+S[k].h})}
+const f0=new Date(days[0]+'T00:00');for(const d in st.sched){const dd=(f0-new Date(d+'T00:00'))/864e5;if(dd>0&&dd<=HIST)for(const k in st.sched[d])if(S[k])st.sched[d][k].forEach(id=>{hrs[id]=(hrs[id]||0)+S[k].h;cnt[id+k]=(cnt[id+k]||0)+1})}
 days.forEach(d=>{delete st.sched[d];delete st.hd[d]});
 for(const d of days){const w=dow(d),used=new Set();st.sched[d]={};st.hd[d]={};const di=days.indexOf(d);['m','a','e'].forEach((sh,si)=>['T','N','H'].forEach(po=>{const L=st.hl[po]||[];if(L.length)st.hd[d][sh+po]=L[(di+si)%L.length]}));const LW=st.hl.W||[];if(LW.length&&S.wash.days.includes(w)&&!st.holidays.includes(d))st.hd[d].wash=LW[di%LW.length];
 for(const k of['gym','kid','eT','eN','eH','mN','mH','mT','aT','aN','aH','wash','rec']){const s=S[k];if(s.days&&(!s.days.includes(w)||st.holidays.includes(d)))continue;const q=s.q(w);
 const pick=(n,f,grp)=>{const pool=st.emps.filter(e=>active(e,d)&&!off(e.id,d)&&can(e,k)&&!used.has(e.id)&&(grp?inGl(e,grp):inG(e,k))&&(!f||f(e)));
-const sc=e=>(hrs[e.id]||0)+DIV*(cnt[e.id+k]||0)+(last[e.id]===di-1?REST:0);
+const mc=pool.length?Math.min(...pool.map(e=>cnt[e.id+k]||0)):0;const sc=e=>(hrs[e.id]||0)+Math.min(CAP,DIV*((cnt[e.id+k]||0)-mc))+(last[e.id]===di-1?REST:0);
 pool.sort((x,y)=>(sc(x)-sc(y))||Math.random()-.5);
 return pool.slice(0,n).map(e=>{used.add(e.id);hrs[e.id]=(hrs[e.id]||0)+s.h;cnt[e.id+k]=(cnt[e.id+k]||0)+1;last[e.id]=di;return e.id})};
 const need=s.qg?s.qg().reduce((a,x)=>a+x[1],0):q.length==1?q[0]:q[0]+q[1];
@@ -161,14 +213,14 @@ const wb=XLSX.utils.book_new(),A=(n,a)=>XLSX.utils.book_append_sheet(wb,XLSX.uti
 A('เวรด่าน',sh(['วันที่','วัน',...KS9.map(k=>SH[k[0]].n.split(' ')[0]+' '+S[k].n)],KS9));A('ยามโรงยิม',sh(['วันที่','วัน','พนักงานประจำ'],['gym']));A('ยามเด็กตลาด',sh(['วันที่','วัน','รายชื่อ'],['kid']));
 A('ล้างตลาด',sh(['วันที่','วัน','รายชื่อ'],['wash'],S.wash.days));A('รับแลกขยะ',sh(['วันที่','วัน','รายชื่อ'],['rec'],S.rec.days));
 A('พนักงาน',[['รหัส','ชื่อ','แผนก','เบอร์โทร','สถานะ','หมายเหตุ'],...st.emps.map(e=>[e.code,e.name,e.dept.replace(/\//g,', '),e.phone,e.status=='off'?'ไม่ทำงาน':'ทำงาน',e.note])]);
-A('วันลาพัก',[['ชื่อ','เริ่มลา','สิ้นสุด'],...st.leaves.map(l=>[(byId(l.emp)||{}).name,l.from,l.to])]);A('งดเวร',[['ชื่อ','เริ่ม','สิ้นสุด','เหตุผล'],...st.bans.map(b=>[(byId(b.emp)||{}).name,b.from,b.to,b.why])]);
+A('วันลาพัก',[['ชื่อ','เริ่มลา','สิ้นสุด'],...st.leaves.map(l=>[(byId(l.emp)||{}).name,l.from,l.to])]);A('งดเวร',[['ชื่อ','เริ่ม','สิ้นสุด','เหตุผล'],...st.bans.map(b=>[(byId(b.emp)||{}).name,b.from,b.to,b.why])]);A('สถิติรายเดือน',[['เดือน','ชื่อ','กลุ่ม','รอบโอที','ชั่วโมง','เวรวันหยุด','ลา(วัน)','งดเวร(วัน)',...GT.map(g=>g[1])],...Object.keys(st.stats).sort().flatMap(m=>st.stats[m].rows.map(r=>[m,r.name,r.dept.split('/').join(', '),r.n,r.h,r.hd,r.lv,r.bn,...GT.map(g=>r.t[g[0]]||0)]))]);
 XLSX.writeFile(wb,'rota-'+month+'.xlsx')}
 function addBan(){const emp=$('#b_e').value,from=$('#b_f').value,k=$('#b_k').value,why=$('#b_w').value.trim();if(!emp||!from)return toast('เลือกชื่อและวันที่ก่อน');const e2=new Date(from+'T00:00');if(k=='w')e2.setDate(e2.getDate()+6);else if(k=='m'){e2.setMonth(e2.getMonth()+1);e2.setDate(e2.getDate()-1)}st.bans.push({id:'b'+Date.now(),emp,from,to:iso(e2),why,k});save();render();toast('บันทึกการงดเวรแล้ว')}
 function delBan(id){st.bans=st.bans.filter(b=>b.id!==id);save();render()}
 function banTab(){const opts=st.emps.filter(e=>e.status!=='off').map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');const ls=[...st.bans].sort((a,b)=>b.from.localeCompare(a.from));const KN={d:'1 วัน',w:'1 อาทิตย์',m:'1 เดือน'};
 return`<h2>งดเวร (ทำผิดระเบียบ)</h2><div class="bar np"><label>ชื่อพนักงาน<select id="b_e">${opts}</select></label><label>เริ่มงดวันที่<input type="date" id="b_f" value="${today}"></label><label>ระยะเวลา<select id="b_k"><option value="d">1 วัน</option><option value="w">1 อาทิตย์</option><option value="m">1 เดือน</option></select></label><label>เหตุผล<input id="b_w" placeholder="ทำผิดระเบียบเรื่อง..." style="min-width:220px"></label><button class="b p" onclick="addBan()">บันทึกการงดเวร</button></div><div class="w"><table><tr><th>ชื่อ</th><th>เริ่มงด</th><th>สิ้นสุด</th><th>ระยะเวลา</th><th>เหตุผล</th><th class="np"></th></tr>${ls.map(b=>{const e=byId(b.emp)||{name:'(ลบแล้ว)'};const now=b.from<=today&&today<=b.to;return`<tr class="${now?'ban':''}"><td>${esc(e.name)}</td><td>${fmt(b.from)}</td><td>${fmt(b.to)}</td><td>${KN[b.k]||''}</td><td>${esc(b.why)}</td><td class="np"><button class="b x" onclick="cf('b${b.id}',()=>delBan('${b.id}'))">ลบ</button></td></tr>`}).join('')||'<tr><td colspan="6">ยังไม่มีข้อมูลการงดเวร</td></tr>'}</table></div><p class="np" style="color:var(--mu)">คนที่ถูกงดเวรจะไม่ถูกจัดเวรอัตโนมัติและไม่อยู่ในรายการเลือกชื่อ ในตารางที่จัดไว้แล้วจะแสดงสีส้ม (งด)</p>`}
-function render(){$('#nav').innerHTML='<b class="br">🌸 ตารางเวร</b>'+'<span style="font-size:12px;color:#fff;white-space:nowrap;margin-right:8px">'+(SB?(conn?'🟢 ออนไลน์':'🟡 กำลังเชื่อมต่อ...'):'🔴 ยังไม่ได้ตั้งค่า config.js')+'</span>'+TABS.map(([k,n])=>`<button class="${k==tab?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
-$('#main').innerHTML=tab=='ov'?ov():tab=='duty'?grid('ตารางเวรด่าน',KS9,'เช้า: ตลาด=แคมป์1 (ขาดคนเสริมแคมป์2) นาสั้ง/ห้วยย้อ=แคมป์2 · บ่าย: ตลาด=โอนเนอร์ 1 + แคมป์1 1 นาสั้ง/ห้วยย้อ=โอนเนอร์+แคมป์2 · เย็น: ตลาด=DC GB · จำนวนตลาด 2 นาสั้ง 2 ห้วยย้อ 1 คน/กะ (หัวหน้าด่านเลือกในช่องบนสุดของแต่ละช่อง ไม่นับโอที)',HDR):tab=='gym'?grid('ตารางยามโรงยิม',['gym'],'วันละ 1 คน ทุกวัน'):tab=='kid'?grid('ตารางยามเด็กตลาด',['kid'],'แม่บ้านแคมป์2 วันละ 3 คน + DC Camp วันละ 2 คน (ปรับจำนวนได้ในช่องด้านบน)'):tab=='wash'?grid('ตารางล้างตลาด (จ. อ. พ. ศ. ส.)',['wash'],'วันละ 13 คน (หญิง 9 + ชาย 4) หัวหน้าหมุนเวียนทุกคนยกเว้นสมสัก ไม่มี พฤหัส/อาทิตย์/วันหยุด'):tab=='rec'?grid('ตารางรับแลกขยะ (จ.-ศ.)',['rec'],'จันทร์ 15 · อังคาร 11 · พุธ 15 · พฤหัส 15 · ศุกร์ 7 คน (ไม่รวมหัวหน้า) ไม่มีวันหยุด'):tab=='emp'?emp():tab=='hol'?holTab():tab=='ban'?banTab():lv()}
+function render(){$('#nav').innerHTML='<b class="br">🌸 ตารางเวร</b>'+'<span style="font-size:12px;color:#fff;white-space:nowrap;margin-right:8px">'+(SB?(conn?'🟢 ออนไลน์':'🟡 กำลังเชื่อมต่อ...'):'🔴 ยังไม่ได้ตั้งค่า config.js')+'</span>'+'<span id="svb"></span>'+TABS.map(([k,n])=>`<button class="${k==tab?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
+paintSave();$('#main').innerHTML=tab=='ov'?ov():tab=='duty'?grid('ตารางเวรด่าน',KS9,'เช้า: ตลาด=แคมป์1 (ขาดคนเสริมแคมป์2) นาสั้ง/ห้วยย้อ=แคมป์2 · บ่าย: ตลาด=โอนเนอร์ 1 + แคมป์1 1 นาสั้ง/ห้วยย้อ=โอนเนอร์+แคมป์2 · เย็น: ตลาด=DC GB · จำนวนตลาด 2 นาสั้ง 2 ห้วยย้อ 1 คน/กะ (หัวหน้าด่านเลือกในช่องบนสุดของแต่ละช่อง ไม่นับโอที)',HDR):tab=='gym'?grid('ตารางยามโรงยิม',['gym'],'วันละ 1 คน ทุกวัน'):tab=='kid'?grid('ตารางยามเด็กตลาด',['kid'],'แม่บ้านแคมป์2 วันละ 3 คน + DC Camp วันละ 2 คน (ปรับจำนวนได้ในช่องด้านบน)'):tab=='wash'?grid('ตารางล้างตลาด (จ. อ. พ. ศ. ส.)',['wash'],'วันละ 13 คน (หญิง 9 + ชาย 4) หัวหน้าหมุนเวียนทุกคนยกเว้นสมสัก ไม่มี พฤหัส/อาทิตย์/วันหยุด'):tab=='rec'?grid('ตารางรับแลกขยะ (จ.-ศ.)',['rec'],'จันทร์ 15 · อังคาร 11 · พุธ 15 · พฤหัส 15 · ศุกร์ 7 คน (ไม่รวมหัวหน้า) ไม่มีวันหยุด'):tab=='emp'?emp():tab=='hol'?holTab():tab=='hist'?histTab():tab=='ban'?banTab():lv()}
 render();
 </script>
 </body>
