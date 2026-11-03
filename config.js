@@ -3,5 +3,5 @@
 window.CONFIG = {
   URL: 'https://fzorcgslsaqyspwzjfyh.supabase.co',   // Project URL (ลงท้าย .supabase.co ไม่มี / ท้าย)
   KEY: 'วาง-anon-public-key-ที่ขึ้นต้น-eyJ-ตรงนี้',    // anon public key
-  PIN: ''   // (ไม่บังคับ) ตั้งรหัสสั้นๆ เช่น '1234' ถ้าต้องการให้คนที่รู้รหัสเท่านั้นกด "บันทึก" ได้ ปล่อยว่างถ้าไม่ใช้
+  PIN: 'camp1234'   
 }
