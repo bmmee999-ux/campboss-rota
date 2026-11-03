@@ -80,18 +80,22 @@ function load(){try{const j=localStorage.getItem('rota');if(j)return JSON.parse(
 const DEFHL={T:['พอนทิบ','คำวิไล','ทิดาพอน'],N:['เสาแก้ว'],H:['สมสัก'],W:['พอนทิบ','คำวิไล','ทิดาพอน','เสาแก้ว'],R:{1:['สมยอด','น้อยนิ','เวียงสะหวัน','แก้วมะนี'],2:['สมยอด','น้อยนิ','บุนมี'],3:['สมยอด','น้อยนิ','เวียงสะหวัน','บุนมี'],4:['สมยอด','น้อยนิ','เวียงสะหวัน','บุนมี'],5:['แก้วมะนี']}};
 function fixHl(){if(!st.hl||Array.isArray(st.hl))st.hl=JSON.parse(JSON.stringify(DEFHL));if(!st.hl.W)st.hl.W=[...DEFHL.W];if(!st.hl.R)st.hl.R=JSON.parse(JSON.stringify(DEFHL.R));st.bans=st.bans||[];st.kidA=st.kidA||3;st.kidB=st.kidB||2;st.stats=st.stats||{};st.subs=st.subs||[]}
 let st=load();st.holidays=st.holidays||[];st.hnames=st.hnames||{};st.hd=st.hd||{};fixHl();
-const SB_URL=((window.CONFIG||{}).URL||'').trim(),SB_KEY=((window.CONFIG||{}).KEY||'').trim();
-const SB=SB_URL.startsWith('https://')&&SB_KEY.length>40;
-const SBH={apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'};
+const SB_URL=String((window.CONFIG||{}).URL||'').replace(/\s+/g,'').replace(/\/rest\/v1\/?$/i,'').replace(/\/+$/,''),SB_KEY=String((window.CONFIG||{}).KEY||'').replace(/[\s'"]+/g,'');
+const cfgErr=!SB_URL?'ยังไม่ได้ใส่ URL ใน config.js':!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SB_URL)?'URL ใน config.js ไม่ถูกรูปแบบ (ต้องเป็น https://รหัส.supabase.co)':!/^[A-Za-z0-9._-]{40,}$/.test(SB_KEY)?'KEY ใน config.js ยังไม่ถูกต้อง: ต้องวาง anon public key (ขึ้นต้น eyJ...) ที่คัดลอกจาก Supabase ทับข้อความตัวอย่าง':'';
+const SB=!cfgErr;
+const SBH={apikey:SB_KEY,'Content-Type':'application/json'};if(SB_KEY.startsWith('eyJ'))SBH.Authorization='Bearer '+SB_KEY;
+async function probe(){const host=SB_URL.replace(/^https:\/\//,'');if(typeof navigator!=='undefined'&&navigator.onLine===false)return'ไม่มีสัญญาณอินเทอร์เน็ต';
+try{await fetch(SB_URL+'/rest/v1/',{mode:'no-cors'});return'ติดต่อ '+host+' ได้ แต่ถูกปฏิเสธ — ตรวจ KEY ใน config.js (ต้องเป็น anon public key เต็มสาย)'}
+catch(e){return'เข้า '+host+' ไม่ได้ — URL ผิดตัวอักษร / โปรเจกต์ถูกพัก (Paused) ใน Supabase / เครือข่ายบล็อก supabase.co'}}
 const HM={401:'key ไม่ถูกต้องหรือหมดอายุ (ตรวจ KEY ใน config.js)',403:'ไม่มีสิทธิ์เขียนตาราง (รัน setup.sql ครบหรือยัง)',404:'ไม่พบตาราง app_state (ยังไม่ได้รัน setup.sql)',413:'ข้อมูลใหญ่เกินไป',429:'ส่งข้อมูลถี่เกินไป รอสักครู่'};
-async function sbFetch(u,o){let r;try{r=await fetch(u,o)}catch(e){throw new Error('เชื่อมต่อ Supabase ไม่ได้ ตรวจ URL ใน config.js หรืออินเทอร์เน็ต')}
+async function sbFetch(u,o){let r;try{r=await fetch(u,o)}catch(e){throw new Error(await probe())}
 if(!r.ok){let t='';try{t=(await r.text()).slice(0,100)}catch(e){}throw new Error('HTTP '+r.status+' '+(HM[r.status]||'')+(t&&!HM[r.status]?' — '+t:''))}return r}
 async function remoteGet(){const r=await sbFetch(SB_URL+'/rest/v1/app_state?id=eq.main&select=data',{headers:SBH});const j=await r.json();return j[0]?j[0].data:null}
 async function remoteSet(o){await sbFetch(SB_URL+'/rest/v1/app_state',{method:'POST',headers:{...SBH,Prefer:'resolution=merge-duplicates'},body:JSON.stringify([{id:'main',data:o},{id:'bk-'+today,data:o}])})}
 const canRemote=()=>SB;
 
 // ===== ระบบบันทึก: การแก้ไขเป็น "ร่าง" ในเครื่องนี้ จนกว่าจะกด 💾 บันทึก =====
-let dirty=false,baseStr='',baseV=0,remoteNewer=false,lastSaved='',histM='',conn=false,lastErr='';
+let dirty=false,baseStr='',baseV=0,remoteNewer=false,lastSaved='',histM='',conn=false,lastErr='',everLoaded=false;
 const PINREQ=((window.CONFIG||{}).PIN||'').trim();
 const norm=()=>{st.holidays=st.holidays||[];st.hnames=st.hnames||{};st.hd=st.hd||{};fixHl()};
 baseStr=JSON.stringify(st);baseV=st._v||0;
@@ -102,10 +106,11 @@ function paintSave(){const e=$('#svb');if(!e)return;
 e.innerHTML=dirty?`${PINREQ?'<input id="pin" type="password" placeholder="รหัสบันทึก" style="width:96px;padding:4px 8px;border-radius:8px;border:0">':''}<button class="sv1" onclick="commit()">💾 บันทึก</button><button onclick="cf('rv',revert)">↩ ยกเลิกการแก้ไข</button><span class="svt">● ยังไม่ได้บันทึก${remoteNewer?' · มีคนบันทึกใหม่กว่า':''}</span>`:`<span class="svt">✓ บันทึกแล้ว${lastSaved?' '+lastSaved:''}</span>`}
 function adopt(o,keepDraft){st=o;norm();baseStr=JSON.stringify(st);baseV=st._v||0;dirty=false;remoteNewer=false;if(!keepDraft){try{localStorage.removeItem('rota_draft')}catch(e){}}render()}
 async function pull(first){if(!canRemote())return;
-try{const o=await remoteGet();conn=true;lastErr='';
-if(!o){if(first)await commit(true);return}
+try{const o=await remoteGet();conn=true;lastErr='';const fst=first||!everLoaded;everLoaded=true;
+if(!o){if(fst&&!dirty)await commit(true);return}
 const rv=o._v||0;
-if(first){const d=readDraft();adopt(o,true);if(d&&d.baseV===rv){st=d.st;norm();dirty=true;render();toast('กู้คืนร่างที่ยังไม่ได้บันทึกแล้ว')}else{try{localStorage.removeItem('rota_draft')}catch(e){}}return}
+if(fst&&dirty){remoteNewer=rv>baseV;paintSave();return}
+if(fst){const d=readDraft();adopt(o,true);if(d&&d.baseV===rv){st=d.st;norm();dirty=true;render();toast('กู้คืนร่างที่ยังไม่ได้บันทึกแล้ว')}else{try{localStorage.removeItem('rota_draft')}catch(e){}}return}
 if(!dirty){if(rv>baseV&&!/INPUT|SELECT|TEXTAREA/.test((document.activeElement||{}).tagName||''))adopt(o)}
 else{const nv=rv>baseV;if(nv!==remoteNewer){remoteNewer=nv;paintSave()}}
 }catch(e){const m=(e&&e.message)||'';if(conn||m!==lastErr){conn=false;lastErr=m;render()}}}
@@ -120,6 +125,7 @@ try{localStorage.setItem('rota',JSON.stringify(st));localStorage.removeItem('rot
 baseStr=JSON.stringify(st);baseV=st._v;dirty=false;remoteNewer=false;armed={};
 lastSaved=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});paintSave();if(!first)toast('บันทึกเรียบร้อย')
 }catch(e){toast('บันทึกไม่สำเร็จ: '+((e&&e.message)||'ตรวจอินเทอร์เน็ตแล้วลองใหม่'))}}
+function retryConn(){lastErr='';render();pull(false)}
 function revert(){try{st=JSON.parse(baseStr)}catch(e){return}try{localStorage.removeItem('rota_draft')}catch(e){}dirty=false;remoteNewer=false;render();toast('ยกเลิกการแก้ไขแล้ว');pull(false)}
 if(!window.claude&&!(typeof SB!=='undefined'&&SB)){const d=readDraft();if(d&&d.baseV===baseV){st=d.st;norm();dirty=true}}
 
@@ -152,6 +158,7 @@ if(!ms.length)return`<h2>สถิติย้อนหลัง</h2><div class=
 if(histM!='all'&&!ms.includes(histM))histM=ms[0];
 const at=histM=='all'?'':'<p style="color:var(--mu)">บันทึกเมื่อ '+new Date(st.stats[histM].at).toLocaleString('th-TH')+'</p>';
 return`<h2>สถิติย้อนหลัง</h2><div class="bar"><label>เดือน<select onchange="histM=this.value;render()"><option value="all" ${histM=='all'?'selected':''}>รวมทุกเดือน (สะสม)</option>${ms.map(m=>`<option value="${m}" ${m==histM?'selected':''}>${m}</option>`).join('')}</select></label></div>${at}${statsTableHtml(histRows())}`}
+if(cfgErr)setTimeout(()=>toast(cfgErr,15000),400);
 pull(true);setInterval(()=>pull(false),10000);
 
 const byId=id=>st.emps.find(e=>e.id===id);
@@ -251,7 +258,7 @@ return`<h2>งดเวร (ทำผิดระเบียบ)</h2><div class
 const TC={ov:'#c0407a',duty:'#2f6fd6',gym:'#7c4dbd',kid:'#0f8b8d',wash:'#0e7fb8',rec:'#4d8a2b',emp:'#475569',lv:'#4f46e5',ban:'#b45309',hol:'#be185d',hist:'#0f766e'};
 function mixHex(h,t,a){const p=x=>parseInt(x,16),c=[1,3,5].map(i=>p(h.slice(i,i+2))),d=[1,3,5].map(i=>p(t.slice(i,i+2)));return'#'+c.map((v,i)=>Math.round(v*a+d[i]*(1-a)).toString(16).padStart(2,'0')).join('')}
 function paintTheme(){if(!document.documentElement)return;const c=TC[tab]||'#c0407a',dark=!!(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches),r=document.documentElement.style;r.setProperty('--pr',dark?mixHex(c,'#ffffff',.82):c);r.setProperty('--th',dark?mixHex(c,'#212226',.3):mixHex(c,'#ffffff',.16))}
-function render(){paintTheme();$('#nav').innerHTML='<b class="br">🌸 ตารางเวร</b>'+'<span style="font-size:12px;color:#fff;white-space:nowrap;margin-right:8px">'+(SB?(conn?'🟢 ออนไลน์':(lastErr?'🔴 '+lastErr.slice(0,80):'🟡 กำลังเชื่อมต่อ...')):'🔴 ยังไม่ได้ตั้งค่า config.js')+'</span>'+'<span id="svb"></span>'+TABS.map(([k,n])=>`<button class="${k==tab?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
+function render(){paintTheme();$('#nav').innerHTML='<b class="br">🌸 ตารางเวร</b>'+'<span style="font-size:13px;color:#fff;max-width:480px;line-height:1.25;margin-right:8px">'+(SB?(conn?'🟢 ออนไลน์':(lastErr?'🔴 '+esc(lastErr)+' <button onclick="retryConn()">🔄 ลองใหม่</button>':'🟡 กำลังเชื่อมต่อ...')):'🔴 '+esc(cfgErr))+'</span>'+'<span id="svb"></span>'+TABS.map(([k,n])=>`<button class="${k==tab?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
 paintSave();$('#main').innerHTML=tab=='ov'?ov():tab=='duty'?grid('ตารางเวรด่าน',KS9,'เช้า: ตลาด=แคมป์1 (ขาดคนเสริมแคมป์2) นาสั้ง/ห้วยย้อ=แคมป์2 · บ่าย: ตลาด=โอนเนอร์ 1 + แคมป์1 1 นาสั้ง/ห้วยย้อ=โอนเนอร์+แคมป์2 · เย็น: ตลาด=DC GB · จำนวนตลาด 2 นาสั้ง 2 ห้วยย้อ 1 คน/กะ (หัวหน้าด่านเลือกในช่องบนสุดของแต่ละช่อง ไม่นับโอที)',HDR):tab=='gym'?grid('ตารางยามโรงยิม',['gym'],'วันละ 1 คน ทุกวัน'):tab=='kid'?grid('ตารางยามเด็กตลาด',['kid'],'แม่บ้านแคมป์2 วันละ 3 คน + DC Camp วันละ 2 คน (ปรับจำนวนได้ในช่องด้านบน)'):tab=='wash'?grid('ตารางล้างตลาด (จ. อ. พ. ศ. ส.)',['wash'],'วันละ 13 คน (หญิง 9 + ชาย 4) หัวหน้าหมุนเวียนทุกคนยกเว้นสมสัก ไม่มี พฤหัส/อาทิตย์/วันหยุด'):tab=='rec'?grid('ตารางรับแลกขยะ (จ.-ศ.)',['rec'],'จันทร์ 15 · อังคาร 11 · พุธ 15 · พฤหัส 15 · ศุกร์ 7 คน (ไม่รวมหัวหน้า) ไม่มีวันหยุด'):tab=='emp'?emp():tab=='hol'?holTab():tab=='hist'?histTab():tab=='ban'?banTab():lv()}
 render();
 </script>
